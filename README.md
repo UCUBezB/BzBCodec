@@ -50,8 +50,6 @@ To create a pull request:
 
 We are open to improvements in our project. If you have any ideas or you are ready to help, contact us!
 
-Facebook: [Yaroslav_Brovchenko](https://www.facebook.com/profile.php?id=100007232269167)
-
 Project Link: [https://github.com/normangalt/Cosmetics-Check](https://github.com/UCUBezB/BzBCodec)
 
 
