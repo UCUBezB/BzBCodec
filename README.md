@@ -46,13 +46,6 @@ To create a pull request:
 # License
 [MIT License](https://choosealicense.com/licenses/mit/)
 
-## Feel free to contact
-
-We are open to improvements in our project. If you have any ideas or you are ready to help, contact us!
-
-Project Link: [https://github.com/normangalt/Cosmetics-Check](https://github.com/UCUBezB/BzBCodec)
-
-
 
 ## Credits
 
