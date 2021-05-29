@@ -2,13 +2,15 @@ import numpy as np
 from time import time
 from typing import Tuple, List
 
+
+
 def compress(
-        initial_input_array: np.array, max_offset: int=511, max_length: int=510
+        initial_input_array: np.array, max_offset: int=255, max_length: int=254
     ) -> List[Tuple[int, int, str]]:
 
     output = []
 
-    buffer = np.array([], dtype=np.int16)
+    buffer = np.array([])
     input_array = initial_input_array
 
     current_cut_position = 0
@@ -58,7 +60,11 @@ def best_length_offset(
 
     length = 0
 
-    for index in range(1, len(cut_buffer) + 1):
+    for index_i in range(1, len(cut_buffer) + 1):
+        index = index_i // 2
+        index = (len(cut_buffer) - index) if index_i % 2 == 0 else index
+        index += 1
+
         char = cut_buffer[-index]
         if char == input_array[0]:
 
@@ -68,8 +74,35 @@ def best_length_offset(
             if found_length > length:
                 length = found_length
                 offset = found_offset
-        
+
+                if index_i % 2 == 0:
+                    # we found something beginning from the longer ones
+                    break
 
     return min(length, max_length), offset
 
+def array_size(compressed_array: list) -> int:
+    '''
+    Return size of array before compression.
+    '''
+    return sum(list(zip(*compressed_array))[1])
 
+def decompress(compressed):
+    '''
+    Decompress array.
+    '''
+
+    arr_size = array_size(compressed)
+    decompressed_array = np.zeros([arr_size], dtype=np.int16)
+    current_index = 0
+    for value in compressed:
+        print(value)
+        offset, length, char = value
+        if offset == 0:
+            decompressed_array[current_index:current_index+length] = char
+            current_index += length
+        else:
+            decompressed_array[current_index:current_index+length] = decompressed_array[current_index-offset:current_index-offset+length]
+            current_index += length
+
+    return decompressed_array
