@@ -13,6 +13,7 @@ import os
 class Convert:
     '''
     Class for converting files into customly encoded files.
+    Currently supports mp3, mp4, png and jpg files
 
     Attributes
     ----------
@@ -23,7 +24,15 @@ class Convert:
     Methods
     -------
     _convert_img(image)
-
+        private method necessary for converting image into numpy array
+    save_img()
+        compresses the image and creates encoded file
+    save_vid()
+        compresses the video and creates encoded file
+    save_audio()
+        compresses the audio and creates encoded file
+    save()
+        compresses any given file or raises the error if it is unsupported
     '''
     def __init__(self, path: str):
         if not os.path.exists(path):
@@ -31,13 +40,19 @@ class Convert:
 
         self.path = path
 
-    def _convert_img(self, image):
+    def _convert_img(self, image) -> tuple:
+        '''
+        Private method for converting image into numpy array
+        '''
         arr = np.array(image)
         shape = np.array(arr.shape)
         flat_arr = arr.ravel()
         return flat_arr, shape
 
     def save_img(self):
+        '''
+        compresses the image and creates encoded file
+        '''
         img = Image.open(self.path).convert('RGB')
         arr, shape = self._convert_img(img)
         img_info = np.array([arr, shape])
@@ -45,9 +60,10 @@ class Convert:
         with open(f'{self.path[:-3]}bzbi', 'wb') as file:
             np.save(file, img_info)
 
-        print(img_info)
-
     def save_vid(self):
+        '''
+        compresses the video and creates encoded file
+        '''
         clip = VideoFileClip(self.path)
         rate = clip.fps
         size = clip.size[::-1]
@@ -55,10 +71,13 @@ class Convert:
         print(vid_info)
         clip = clip.subclip(0, 2)
 
+        #convert frames of the video into numpy
         frames = []
         for frame in clip.iter_frames():
+            #insert compression here
             frame_arr = frame.ravel()
             frames.append(frame_arr)
+
         frames = np.array(frames)
 
         frames = np.array([frames, vid_info])
@@ -67,25 +86,23 @@ class Convert:
             np.save(file, frames)
 
     def save_audio(self):
+        '''
+        compresses the audio and creates encoded file
+        '''
         sound = AudioSegment.from_file(self.path, format='mp3')
         peak_amplitude = sound.max
         loudness = sound.dBFS
         channels_cnt = sound.channels
         raw = np.array(sound.get_array_of_samples())
 
-        # test = sound.get_array_of_samples()
-        # print(test[:100])
-        # raw = raw.ravel()
-        if channels_cnt == 2:
-            raw = raw.reshape(-1, 2)
-        # y = np.int16(raw)
         frame_r = sound.frame_rate
-        audio_info = np.array([peak_amplitude, channels_cnt, sound.frame_rate, sound.frame_rate])
-        print(sound.frame_count()/ sound.frame_rate, len(sound))
+        audio_info = np.array([peak_amplitude, channels_cnt, sound.frame_rate, 
+                    sound.frame_rate, sound.frame_count()/ sound.frame_rate], dtype=object)
 
         package = []
         for cnt in range(round(sound.frame_count()/ sound.frame_rate)):
-
+            
+            #insert compression here
 
             package.append(raw[(cnt * sound.frame_rate) : ((cnt + 1)*sound.frame_rate)])
         
@@ -95,44 +112,12 @@ class Convert:
         with open(f'{self.path[:-3]}bzba', 'wb') as file:
             np.save(file, audio)
 
-        # print(len(raw), raw[1500:1700])
-        # print(y[1000:1100])
-        # song = AudioSegment(, frame_rate=frame_r, sample_width=2, channels=channels_cnt)
-        # song.export(f'{self.path[:-5]}1.mp3', format="mp3")
-
-
-        # print(raw[:100])
-
-
-        # ab = np.load(raw)
-        # print(signal[1000:1200])
-
-        # print(arr[1000:1200])
-        # print(ab)
-        # spf = wave.open("/Users/shevdan/Documents/Programming/Python/DMProject/BzBCodec/examples/test_audi1.wav", "r")
-        # # Extract Raw Audio from Wav File
-        # signal = spf.readframes(-1)
-        # signal = np.fromstring(signal, "Int16")
-        # fs = spf.getframerate()
-        # signal = signal.ravel()
-
-        # Time = np.linspace(0, len(signal) / fs, num=len(signal))
-
-        # plt.figure(1)
-        # plt.title("Signal Wave...")
-        # plt.plot(Time, signal)
-        # plt.show()
-
-
-
-
-        # plt.title("Signal Wave...")
-        # # plt.figure(figsize=(20, 20))
-        # plt.plot(arr)
-        # plt.show()
-
+    
     def save(self):
-        if self.path.endswith('jpg') or self.path.endswith('.png'):
+        '''
+        compresses any given file or raises the error if it is unsupported
+        '''
+        if self.path.endswith('.jpg') or self.path.endswith('.png'):
             self.save_img()
         elif self.path.endswith('mp4'):
             self.save_vid()
@@ -140,17 +125,3 @@ class Convert:
             self.save_audio()
         else:
             raise ValueError('Currently unsupported file.')
-
-
-
-if __name__ == '__main__':
-    path = './examples/test_audio.mp3'
-
-    # add_usr_local_bin()
-    # print(os.environ['PATH'])
-    # print()
-    # print(os.pathsep)
-
-    conv = Convert(path)
-    conv.save()
-
