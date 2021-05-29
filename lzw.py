@@ -1,7 +1,7 @@
 '''
 TODO: rewrite via numpy so to increase the speed of execution
 '''
-)
+
 from typing import List, Tuple, Dict
 
 def lzw_compress(bitarray: List[int]) -> List[int]:
