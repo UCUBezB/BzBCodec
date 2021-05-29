@@ -52,7 +52,7 @@ We are open to improvements in our project. If you have any ideas or you are rea
 
 Facebook: [Yaroslav_Brovchenko](https://www.facebook.com/profile.php?id=100007232269167)
 
-Project Link: [https://github.com/normangalt/Cosmetics-Check](https://github.com/normangalt/Cosmetics-Check)
+Project Link: [https://github.com/normangalt/Cosmetics-Check](https://github.com/UCUBezB/BzBCodec)
 
 
 
