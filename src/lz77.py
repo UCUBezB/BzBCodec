@@ -9,7 +9,7 @@ from typing import Tuple, List
 
 def compress(
     initial_input_array: np.array, max_offset: int = 255, max_length: int = 254
-) -> List[Tuple[int, int, str]]:
+) -> List[Tuple[int, int, int]]:
 
     output = []
 
@@ -97,7 +97,7 @@ def array_size(compressed_array: list) -> int:
     return sum(list(zip(*compressed_array))[1])
 
 
-def decompress(compressed: List[Tuple[int, int, str]]) -> np.array:
+def decompress(compressed: List[Tuple[int, int, int]]) -> np.array:
     '''
     Decompress array.
     '''
