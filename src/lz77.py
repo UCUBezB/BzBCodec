@@ -97,7 +97,7 @@ def array_size(compressed_array: list) -> int:
     return sum(list(zip(*compressed_array))[1])
 
 
-def decompress(compressed: np.array) -> np.array:
+def decompress(compressed: List[Tuple[int, int, str]]) -> np.array:
     '''
     Decompress array.
     '''
