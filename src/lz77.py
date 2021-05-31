@@ -3,7 +3,7 @@ from time import time
 from typing import Tuple, List
 
 def compress(
-        initial_input_array: np.array, max_offset: int=128, max_length: int=65535
+        initial_input_array: np.array, max_offset: int=255, max_length: int=65535
     ) -> List[Tuple[int, int, str]]:
 
     output = []
@@ -24,7 +24,10 @@ def compress(
         buffer = initial_input_array[:current_cut_position]
         input_array = initial_input_array[current_cut_position:]
 
-    return np.array(output, dtype=[('offset', 'uint8'), ('length', 'uint16'), ('pixel', 'uint8')])
+    return np.array(output, dtype=[
+        ('offset', 'uint8'), ('length', 'uint16'),
+        ('value', initial_input_array.dtype)
+    ])
 
 
 def repeating_length_from_start(buffer: np.array, input_array: np.array):
