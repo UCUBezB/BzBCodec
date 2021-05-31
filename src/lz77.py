@@ -6,10 +6,9 @@ import numpy as np
 from time import time
 from typing import Tuple, List
 
-
 def compress(
-    initial_input_array: np.array, max_offset: int = 255, max_length: int = 254
-) -> List[Tuple[int, int, int]]:
+        initial_input_array: np.array, max_offset: int=128, max_length: int=65536
+    ) -> List[Tuple[int, int, str]]:
 
     output = []
 
@@ -21,10 +20,9 @@ def compress(
     print_i = 0
     while len(input_array) != 0:
         print_i += 1
-        if print_i % 100 == 0:
+        if print_i % 1000 == 0:
             print(current_cut_position, end='    \r')
-        length, offset = best_length_offset(
-            buffer, input_array, max_length, max_offset)
+        length, offset = best_length_offset(buffer, input_array, max_length, max_offset)
         output.append((offset, length, input_array[0]))
         current_cut_position += length
         buffer = initial_input_array[:current_cut_position]
@@ -38,52 +36,61 @@ def repeating_length_from_start(buffer: np.array, input_array: np.array):
     Return the repeating length of the input array from the start of buffer.
     '''
     min_len = min(len(buffer), len(input_array))
-    not_equal_indexes = np.flatnonzero(
-        buffer[:min_len] != input_array[:min_len])
-    return min_len if len(not_equal_indexes) == 0 else not_equal_indexes[0]
+    not_equal_indexes = np.flatnonzero(buffer[:min_len] != input_array[:min_len])
+    if len(not_equal_indexes) == 0:
+        length_delta = 0
+        while len(not_equal_indexes) == 0:
+            if len(buffer) < len(input_array):
+                length_delta += min_len
+                input_array = input_array[min_len:]
+                min_len = min(len(buffer), len(input_array))
+                not_equal_indexes = np.flatnonzero(buffer[:min_len] != input_array[:min_len])
+            else:
+                return min_len + length_delta
+        return not_equal_indexes[0] + length_delta
+    else:
+        return not_equal_indexes[0]
 
 
 def best_length_offset(
-    buffer: np.array, input_array: np.array,
-    max_length: int = 15, max_offset: int = 4095
-) -> Tuple[int, int]:
+        buffer: np.array, input_array: np.array,
+        max_length: int=15, max_offset: int=4095
+    ) -> Tuple[int, int]:
 
-    if max_offset < len(buffer):
-        cut_buffer = buffer[-max_offset:]
-    else:
-        cut_buffer = buffer
-
-    if input_array is None or len(input_array) == 0:
-        return 0
-
-    length, offset = (1, 0)
+    cut_buffer = buffer[-max_offset:]
 
     if input_array[0] not in cut_buffer:
-        best_length = input_array[0] == input_array[1]
+        for i in range(10):
+            if not (len(input_array) > (i + 1) and input_array[i + 1] == input_array[i]):
+                best_length = i
+                break
+        else:
+            input_array = input_array[:max_length]
+            not_equal_indexes = np.flatnonzero(input_array[1:] != input_array[0])
+            best_length = max(len(input_array) - 1, 0) if len(not_equal_indexes) == 0 else not_equal_indexes[0]
         return min(
-            (length + best_length), max_length
-        ), offset
+            best_length + 1, max_length
+        ), 0
 
-    length = 0
+    input_array = input_array[:max_length]
 
-    for index_i in range(1, len(cut_buffer) + 1):
-        index = index_i // 2
-        index = (len(cut_buffer) - index) if index_i % 2 == 0 else index
-        index += 1
+    length, offset = 0, 0
+
+    for index in range(len(cut_buffer), 0, -1):
 
         char = cut_buffer[-index]
         if char == input_array[0]:
 
-            found_offset = index
-            found_length = repeating_length_from_start(
-                cut_buffer[-index:], input_array)
+            found_length = repeating_length_from_start(cut_buffer[-index:], input_array)
 
             if found_length > length:
                 length = found_length
-                offset = found_offset
+                offset = index
 
-                if index_i % 2 == 0:
-                    # we found something beginning from the longer ones
+                # break  # uncomment for fast (but uneffective) convertion video
+
+                if length >= len(input_array):
+                    # we won't find anything better
                     break
 
     return min(length, max_length), offset
@@ -93,7 +100,7 @@ def array_size(compressed_array: list) -> int:
     '''
     Return size of array before compression.
     '''
-    
+
     return sum(list(zip(*compressed_array))[1])
 
 
@@ -101,9 +108,8 @@ def decompress(compressed: List[Tuple[int, int, int]]) -> np.array:
     '''
     Decompress array.
     '''
-
     arr_size = array_size(compressed)
-    decompressed_array = np.zeros([arr_size], dtype=np.int16)
+    decompressed_array = np.zeros(arr_size)
     current_index = 0
     for value in compressed:
         offset, length, char = value
@@ -111,8 +117,26 @@ def decompress(compressed: List[Tuple[int, int, int]]) -> np.array:
             decompressed_array[current_index:current_index+length] = char
             current_index += length
         else:
-            decompressed_array[current_index:current_index +
-                               length] = decompressed_array[current_index-offset:current_index-offset+length]
+            while length >= offset:
+                decompressed_array[
+                    current_index:current_index + offset
+                ] = decompressed_array[current_index-offset:current_index]
+                current_index += offset
+                length -= offset
+            decompressed_array[
+                current_index:current_index + length
+            ] = decompressed_array[current_index-offset:current_index-offset+length]
             current_index += length
 
     return decompressed_array
+
+if __name__ == "__main__":
+    for name in ['image.bzbi', 'screenshot.bzbi']:
+        print(name, end=':\n')
+        img = np.load(name, allow_pickle=True)[0]
+        print(len(img))
+        t = time()
+        img_comp = compress(img)
+        print(len(img_comp), end='        \n')
+        print(time() - t)
+        print(np.all(decompress(img_comp) == img))
