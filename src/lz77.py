@@ -1,7 +1,5 @@
 '''
 LZ77 Compression alghorithm.
-
-TODO: Please consider wrapping it up into a class
 '''
 
 import numpy as np
