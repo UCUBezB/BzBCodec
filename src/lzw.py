@@ -1,11 +1,11 @@
 '''
 TODO: rewrite via numpy so to increase the speed of execution
+TODO: please consider wrapping it up into a class
+TODO: there is some problem with decompression (some bits are lost, though their amount is < 1%)
 '''
 
 import numpy as np
 from typing import List, Tuple, Dict
-
-from numpy.core.fromnumeric import compress
 
 def lzw_compress(data: np.array) -> np.array:
     '''
