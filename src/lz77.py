@@ -1,3 +1,9 @@
+'''
+LZ77 Compression alghorithm.
+
+TODO: Please consider wrapping it up into a class
+'''
+
 import numpy as np
 from time import time
 from typing import Tuple, List
@@ -130,12 +136,13 @@ def decompress(compressed: List[Tuple[int, int, int]]) -> np.array:
     return decompressed_array
 
 if __name__ == "__main__":
-    for name in ['image.bzbi', 'screenshot.bzbi']:
+    for name in ['examples/test_img.bzbi']:
         print(name, end=':\n')
         img = np.load(name, allow_pickle=True)[0]
         print(len(img))
         t = time()
         img_comp = compress(img)
+        print(img_comp)
         print(len(img_comp), end='        \n')
         print(time() - t)
         print(np.all(decompress(img_comp) == img))
