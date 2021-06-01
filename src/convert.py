@@ -63,13 +63,16 @@ class Convert:
         '''
         Private method for converting image into numpy array
         '''
-        arr = np.array(image)
-        shape = np.array(arr.shape, dtype='uint8')
+        arr = np.array(image, dtype='uint8')
+        print(arr.shape)
+        shape = np.array(arr.shape, dtype='uint16')
+        print(shape)
         if self.compress == HuffmanCode:
             flat_arr = self.compress(arr.ravel()).encode()[0]
         else:
 
             flat_arr = self.compress(arr.ravel())
+
 
         # flat_arr = np.array(flat_arr, dtype=[('offset', 'uint8'), ('length', 'uint16'), ('pixel', 'uint8')])
         # print(flat_arr)
@@ -81,6 +84,9 @@ class Convert:
         compresses the image and creates encoded file
         '''
         img = Image.open(self.path).convert('RGB')
+        sshape = (*img.size, 3)
+        print(sshape)
+        
         arr, shape = self._convert_img(img)
         img_info = np.array([arr, shape])
 
