@@ -44,6 +44,9 @@ class Convert:
         self.path = path
         self.compress = self.compresssion(compression_type)
 
+    
+        
+
     def compresssion(self, compression_type):
         if compression_type.lower() == 'lz77':
             return compress
@@ -51,9 +54,9 @@ class Convert:
             return lzw_compress
         if compression_type.lower() == 'deflate':
             return Deflate().encode
-        if 'deflate' in compression_type.lower():
-            return HuffmanCode().encode
-        raise ValueError('Unsupported compression. One of the following are supported:\
+        if 'huffman' in compression_type.lower():
+            return HuffmanCode
+        raise ValueError('Unsupported compression. One of the following is supported:\
  lz77, lzw, huffman, deflate')
 
     def _convert_img(self, image) -> tuple:
@@ -62,7 +65,11 @@ class Convert:
         '''
         arr = np.array(image)
         shape = np.array(arr.shape, dtype='uint8')
-        flat_arr = self.compress(arr.ravel())
+        if self.compress == HuffmanCode:
+            flat_arr = self.compress(arr.ravel()).encode()[0]
+        else:
+
+            flat_arr = self.compress(arr.ravel())
 
         # flat_arr = np.array(flat_arr, dtype=[('offset', 'uint8'), ('length', 'uint16'), ('pixel', 'uint8')])
         # print(flat_arr)
@@ -79,7 +86,8 @@ class Convert:
 
 
         # with open(f'{self.path[:-3]}bzbi', 'wb') as file:
-        np.savez_compressed(f'{self.path[:-3]}bzbi', img_info)
+        np.savez_compressed(f'{self.path[:-3]}bzbi', info=img_info)
+        self.bzb_extension('img')
 
     def save_vid(self):
         '''
@@ -94,9 +102,12 @@ class Convert:
         #convert frames of the video into numpy
         frames = []
         for frame in clip.iter_frames():
-            frame = np.array(frame, dtype='uint8')
-            #insert compression here
-            frame_arr = self.compress(frame.ravel())
+            frame_arr = np.array(frame, dtype='uint8')
+            # #insert compression here
+            if self.compress == HuffmanCode:
+                frame_arr = self.compress(frame.ravel()).encode()[0]
+            else:
+                frame_arr = self.compress(frame.ravel())
 
             frames.append(frame_arr)
 
@@ -105,7 +116,8 @@ class Convert:
         frames = np.array([frames, vid_info])
 
         # with open(f'{self.path[:-3]}bzbv', 'wb') as file:
-        np.savez_compressed(f'{self.path[:-3]}bzbv', frames)
+        np.savez_compressed(f'{self.path[:-3]}bzbv', info=frames)
+        self.bzb_extension('vid')
 
     def save_audio(self):
         '''
@@ -133,7 +145,18 @@ class Convert:
         package = np.array(package)
         audio = np.array([package, audio_info])
 
-        np.savez_compressed(f'{self.path[:-3]}bzba', audio)
+        np.savez_compressed(f'{self.path[:-3]}bzba', info=audio)
+        self.bzb_extension('audio')
+
+
+    def bzb_extension(self, type):
+        if type == 'img':
+            ext = 'bzbi'
+        elif type == 'vid':
+            ext = 'bzbv'
+        else:
+            ext = 'bzba'
+        os.rename(f'{self.path[:-4]}.{ext}.npz', f'{self.path[:-4]}.{ext}')
 
     
     def save(self):
@@ -145,12 +168,17 @@ class Convert:
         elif self.path.endswith('mp4') or self.path.endswith('mov'):
             self.save_vid()
         elif self.path.endswith('mp3'):
+            if self.compress != compress:
+                raise ValueError('lz77 is the only compression algo that supports audio')
             self.save_audio()
         else:
             raise ValueError('Currently unsupported file.')
 
 if __name__ == '__main__':
-    path = './examples/test_audio.mp3'
+    path = './examples/test_img.png'
     
     conv = Convert(path)
     conv.save()
+    # arr = np.load('./examples/test_audio.bzba', allow_pickle=True)
+    # print(arr['info'])
+    # arr.save('/Users/shevdan/Documents/Programming/Python/DMProject/BzBCodec/examples/300x300_5sec.bzbv')
