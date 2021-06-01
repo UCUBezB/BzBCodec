@@ -64,14 +64,14 @@ class Convert:
         Private method for converting image into numpy array
         '''
         arr = np.array(image, dtype='uint8')
-        print(arr.shape)
         shape = np.array(arr.shape, dtype='uint16')
-        print(shape)
+
         if self.compress == HuffmanCode:
             flat_arr = self.compress(arr.ravel()).encode()[0]
         else:
 
             flat_arr = self.compress(arr.ravel())
+
 
 
         # flat_arr = np.array(flat_arr, dtype=[('offset', 'uint8'), ('length', 'uint16'), ('pixel', 'uint8')])
@@ -134,19 +134,23 @@ class Convert:
         loudness = sound.dBFS
         channels_cnt = sound.channels
         raw = np.array(sound.get_array_of_samples())
+        pckg_size = int(sound.frame_rate / (2 * channels_cnt))
 
         frame_r = sound.frame_rate
         audio_info = np.array([peak_amplitude, channels_cnt, sound.frame_rate, 
-                    sound.frame_rate, sound.frame_count()/ sound.frame_rate], dtype=object)
+                    pckg_size, sound.frame_count()/ sound.frame_rate], dtype=object)
+
 
         package = []
-        for cnt in range(round(sound.frame_count()/ sound.frame_rate)):
+        size = pckg_size * channels_cnt
+        for cnt in range(round(sound.frame_count()/ size)):
 
-            compressed_package = np.array(raw[(cnt * sound.frame_rate) : ((cnt + 1)*sound.frame_rate)], dtype='uint16')
+            compressed_package = np.array(raw[(cnt * size) : ((cnt + 1)*size)], dtype='int16')
             #insert compression here
             compressed_package = self.compress(compressed_package)
 
             package.append(compressed_package)
+
         
         package = np.array(package)
         audio = np.array([package, audio_info])
@@ -181,7 +185,7 @@ class Convert:
             raise ValueError('Currently unsupported file.')
 
 if __name__ == '__main__':
-    path = './examples/test_img.png'
+    path = './examples/test_audio.mp3'
     
     conv = Convert(path)
     conv.save()
