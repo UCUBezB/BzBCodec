@@ -143,13 +143,17 @@ class Convert:
 
         package = []
         size = pckg_size * channels_cnt
-        for cnt in range(round(sound.frame_count()/ size)):
+        cnt = 0
+
+        while (cnt + 1) * size < len(raw):
 
             compressed_package = np.array(raw[(cnt * size) : ((cnt + 1)*size)], dtype='int16')
             #insert compression here
             compressed_package = self.compress(compressed_package)
 
             package.append(compressed_package)
+            cnt += 1
+
 
         
         package = np.array(package)
