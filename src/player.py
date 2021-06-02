@@ -165,7 +165,6 @@ def play_video(path, debug=True):
             )
 
     async def prepare_frames(loop):
-        result = np.zeros(metadata[1:], dtype='uint8')
         for frame in video_file[0][1:]:
             result = await loop.run_in_executor(
                 main_thread_decompress_executor, functools.partial(decompress_frame, frame=frame, metadata=metadata)
