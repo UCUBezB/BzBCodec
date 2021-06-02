@@ -34,6 +34,28 @@ def compress(
     ])
 
 
+def merge_parts(compressed):
+    """
+    will reduce element num if repetitions exceed max length
+    remember to set length type 'uint16' -> 'uint32'
+    """
+    compressed_new = [list(compressed[0])]
+    for compressed_i, (offset, length, data) in enumerate(compressed[1:]):
+        if (
+            data == compressed_new[-1][2] and
+            offset != 0 and (
+                (compressed_i + 1) < len(compressed) and
+                length > compressed[compressed_i + 1][0]
+            ) and (
+                compressed_new[-1][0] <= compressed_new[-1][1]
+            ) and offset <= compressed_new[-1][1]
+        ):
+            compressed_new[-1][1] += length
+        else:
+            compressed_new.append([offset, length, data])
+    return [tuple(element) for element in compressed_new]
+
+
 def repeating_length_from_start(buffer: np.array, input_array: np.array):
     '''
     Return the repeating length of the input array from the start of buffer.
@@ -90,7 +112,7 @@ def best_length_offset(
                 length = found_length
                 offset = index
 
-                # break  # uncomment for fast (but uneffective) convertion video
+                # break  # uncomment for fast (but uneffective) convertion (suitable for video)
 
                 if length >= len(input_array):
                     # we won't find anything better
@@ -99,20 +121,12 @@ def best_length_offset(
     return min(length, max_length), offset
 
 
-def array_size(compressed_array: list) -> int:
-    '''
-    Return size of array before compression.
-    '''
-
-    return sum(list(zip(*compressed_array))[1])
-
-
 def decompress(compressed: List[Tuple[int, int, int]]) -> np.array:
     '''
     Decompress array.
     '''
-    arr_size = array_size(compressed)
-    decompressed_array = np.zeros(arr_size)
+    arr_size = np.sum(compressed['length'])
+    decompressed_array = np.zeros(arr_size, dtype=compressed.dtype[2])
     current_index = 0
     for value in compressed:
         offset, length, char = value

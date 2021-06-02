@@ -6,12 +6,10 @@ from collections import Counter, namedtuple
 class Node():
     '''
     Class for creating Nodes and moving through them.
-
     Attributes
     ----------
     left:        left child
     right:        right child
-
     Methods
     -------
     move()
@@ -32,11 +30,9 @@ class Node():
 class Leaf():
     '''
     Class for creating Nodes and moving through them.
-
     Attributes
     ----------
     symbol:        symbol that will be coded
-
     Methods
     -------
     move()
@@ -56,11 +52,9 @@ class Leaf():
 class HuffmanCode():
     '''
     Class for encoding and decoding numpy array with HuffmanCode.
-
     Attributes
     ----------
     data:        information about file
-
     Methods
     -------
     encode()
@@ -69,7 +63,6 @@ class HuffmanCode():
 
     def __init__(self, data):
         """[Initializes variables for HuffmanCode]
-
         Args:
             data: [information about file]
         """        
