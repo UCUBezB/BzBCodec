@@ -45,9 +45,6 @@ class Convert:
         self.path = path
         self.compress = self.compresssion(compression_type)
 
-    
-        
-
     def compresssion(self, compression_type):
         if compression_type.lower() == 'lz77':
             return compress
@@ -93,7 +90,7 @@ class Convert:
         '''
         clip = VideoFileClip(self.path)
         rate = clip.fps
-        print(rate)
+        print(f"Frames num: {clip.reader.nframes}")
         size = clip.size[::-1]
         vid_info = np.array([rate, *size, 3.], dtype = np.int)
 
