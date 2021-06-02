@@ -2,6 +2,7 @@
 Module for converting files into custom codec using compression algos
 '''
 
+import sys
 import numpy as np
 from PIL import Image
 from moviepy.editor import VideoFileClip
@@ -183,7 +184,9 @@ class Convert:
 
 if __name__ == '__main__':
 
-    path = './examples/mouse.mov'
-
-    conv = Convert(path)
-    conv.save()
+    if len(sys.argv) <= 1:
+        print(f"Usage: {sys.argv[0]} file")
+    else:
+        path = sys.argv[1]  # './examples/mouse.mov'
+        conv = Convert(path)
+        conv.save()
