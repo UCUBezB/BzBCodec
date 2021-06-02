@@ -100,6 +100,7 @@ class Convert:
         compresses the video and creates encoded file
         '''
         clip = VideoFileClip(self.path)
+        clip = clip.subclip(0, 1)
         rate = clip.fps
         print(rate)
         size = clip.size[::-1]
@@ -107,7 +108,9 @@ class Convert:
 
         #convert frames of the video into numpy
         frames = []
+        cnt_frame = 0
         for frame in clip.iter_frames():
+            print(f'Current frame: {cnt_frame}', end= ' \r')
             frame_arr = np.array(frame, dtype='uint8')
             # #insert compression here
             if self.compress == HuffmanCode:
@@ -116,6 +119,7 @@ class Convert:
                 frame_arr = self.compress(frame.ravel())
 
             frames.append(frame_arr)
+            cnt_frame += 1
 
         frames = np.array(frames)
 
@@ -177,7 +181,7 @@ class Convert:
         '''
         compresses any given file or raises the error if it is unsupported
         '''
-        if self.path.endswith('.jpg') or self.path.endswith('.png') or self.path.endswith('.jpeg'):
+        if self.path.endswith('.jpg') or self.path.endswith('.png'):
             self.save_img()
         elif self.path.endswith('mp4') or self.path.endswith('mov'):
             self.save_vid()
@@ -189,10 +193,22 @@ class Convert:
             raise ValueError('Currently unsupported file.')
 
 if __name__ == '__main__':
-    path = './examples/test_audio.mp3'
+    import base64
+    import uu
+    path = './examples/test_vid.mp4'
+
+    uu.encode(path, '-')
+    # with open(path, "rb") as videoFile:
+    #     print(videoFile.read())
+    #     text = base64.b64encode(videoFile.read())
+    #     print(text)
+    #     file = open("./examples/textTest.txt", "wb") 
+    #     file.write(text)
+    #     file.close()
+
     
-    conv = Convert(path)
-    conv.save()
+    # conv = Convert(path)
+    # conv.save()
     # arr = np.load('./examples/test_audio.bzba', allow_pickle=True)
     # print(arr['info'])
     # arr.save('/Users/shevdan/Documents/Programming/Python/DMProject/BzBCodec/examples/300x300_5sec.bzbv')
