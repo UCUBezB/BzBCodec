@@ -72,11 +72,6 @@ class Convert:
 
             flat_arr = self.compress(arr.ravel())
 
-
-
-        # flat_arr = np.array(flat_arr, dtype=[('offset', 'uint8'), ('length', 'uint16'), ('pixel', 'uint8')])
-        # print(flat_arr)
-
         return flat_arr, shape
 
     def save_img(self):
@@ -84,14 +79,10 @@ class Convert:
         compresses the image and creates encoded file
         '''
         img = Image.open(self.path).convert('RGB')
-        sshape = (*img.size, 3)
-        print(sshape)
         
         arr, shape = self._convert_img(img)
         img_info = np.array([arr, shape])
 
-
-        # with open(f'{self.path[:-3]}bzbi', 'wb') as file:
         np.savez_compressed(f'{self.path[:-3]}bzbi', info=img_info)
         self.bzb_extension('img')
 
@@ -100,7 +91,6 @@ class Convert:
         compresses the video and creates encoded file
         '''
         clip = VideoFileClip(self.path)
-        clip = clip.subclip(0, 1)
         rate = clip.fps
         print(rate)
         size = clip.size[::-1]
@@ -125,7 +115,6 @@ class Convert:
 
         frames = np.array([frames, vid_info])
 
-        # with open(f'{self.path[:-3]}bzbv', 'wb') as file:
         np.savez_compressed(f'{self.path[:-3]}bzbv', info=frames)
         self.bzb_extension('vid')
 
@@ -152,7 +141,7 @@ class Convert:
         while (cnt + 1) * size < len(raw):
 
             compressed_package = np.array(raw[(cnt * size) : ((cnt + 1)*size)], dtype='int16')
-            #insert compression here
+
             compressed_package = self.compress(compressed_package)
 
             package.append(compressed_package)
@@ -193,22 +182,8 @@ class Convert:
             raise ValueError('Currently unsupported file.')
 
 if __name__ == '__main__':
-    import base64
-    import uu
-    path = './examples/test_vid.mp4'
 
-    uu.encode(path, '-')
-    # with open(path, "rb") as videoFile:
-    #     print(videoFile.read())
-    #     text = base64.b64encode(videoFile.read())
-    #     print(text)
-    #     file = open("./examples/textTest.txt", "wb") 
-    #     file.write(text)
-    #     file.close()
+    path = './examples/mouse.mov'
 
-    
-    # conv = Convert(path)
-    # conv.save()
-    # arr = np.load('./examples/test_audio.bzba', allow_pickle=True)
-    # print(arr['info'])
-    # arr.save('/Users/shevdan/Documents/Programming/Python/DMProject/BzBCodec/examples/300x300_5sec.bzbv')
+    conv = Convert(path)
+    conv.save()
