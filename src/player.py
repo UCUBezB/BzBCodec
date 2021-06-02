@@ -121,9 +121,7 @@ def decompress_frame(frame, metadata):
     """
     decompress frames (in the main thread separate process)
     """
-    t = time()
     ret = decompress(frame).reshape(metadata[1:])
-    print(time() - t)
     return ret
 
 def play_video(path, debug=True):
@@ -133,8 +131,6 @@ def play_video(path, debug=True):
     video_file = np.load(path, allow_pickle=True)['info']
     metadata = video_file[1].astype(int)
     frame_rate = metadata[0]
-
-    print(metadata)
     
     frames_num = len(video_file[0])
 
