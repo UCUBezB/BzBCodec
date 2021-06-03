@@ -11,7 +11,7 @@ import sys
 
 def extract_wave_from_midi(filename='toccata.mid'):
     """
-    extracts wave from midi....(why did i do that?)
+    extracts wave from midi (testing purposes)
     """
     bach = MidiFile(filename)
     sample_rate = 44100
@@ -150,7 +150,7 @@ def play_video(path, debug=True):
         image = np.zeros(metadata[1:]).astype('uint8')
 
         while current_frame_index < frames_num:
-            if debug:
+            if debug and current_frame_index % 10 == 0:
                 print(f'ready {len(ready_frames)} / playing {current_frame_index}', flush=True, end='     \r')
             async with ready_frames_lock:
                 if current_frame_index < len(ready_frames):
