@@ -1,6 +1,9 @@
 from concurrent.futures import ProcessPoolExecutor
+from lz77 import decompress as lz77_decompress
+from Huffman_algo import HuffmanCode
+from lzw import lzw_decompress
 from time import sleep, time
-from lz77 import decompress
+from deflate import Deflate
 from mido import MidiFile
 import sounddevice as sd
 from cv2 import cv2
@@ -77,7 +80,7 @@ def play_audio(path, debug=True):
             outdata[:] = ready_audio[audio_cur_ind]
         ready_audio[audio_cur_ind] = None
         audio_cur_ind += 1
-    transform = lambda buffer: (decompress(buffer) / audio_file[1][0]).reshape((audio_file[1][3], audio_file[1][1]))
+    transform = lambda buffer: (lz77_decompress(buffer) / audio_file[1][0]).reshape((audio_file[1][3], audio_file[1][1]))
     ready_audio = [transform(audio_file[0][0])]
     with sd.OutputStream(
             callback=callback,
@@ -99,7 +102,18 @@ def show_image(path):
     decompress and show image
     """
     image_file = np.load(path, allow_pickle=True)['info']
-    image = np.reshape(decompress(image_file[0]), image_file[1])
+    if len(image_file) > 2:
+        if image_file[2].lower() == 'lzw':
+            decompressed = lzw_decompress(image_file[0])
+        elif image_file[2].lower() == 'deflate':
+            decompressed = Deflate().decode(*image_file[0])
+        elif image_file[2].lower() == 'huffman':
+            decompressed = HuffmanCode(image_file[0][0]).decode(image_file[0][1])
+        else:
+            decompressed = lz77_decompress(image_file[0])
+    else:
+        decompressed = lz77_decompress(image_file[0])
+    image = np.reshape(decompressed, image_file[1])
     print("Press any key to exit...")
     cv2.imshow('image', image)
     cv2.waitKey(0)
@@ -121,7 +135,7 @@ def decompress_frame(frame, metadata):
     """
     decompress frames (in the main thread separate process)
     """
-    ret = decompress(frame).reshape(metadata[1:])
+    ret = lz77_decompress(frame).reshape(metadata[1:])
     return ret
 
 def play_video(path, debug=True):
