@@ -10,6 +10,10 @@
 
 # Description
 
+This program is implementation of custom codec applied for images, videos and audio files.
+It allows usage of LZW, LZ77, Huffman and Deflate algorithms of compression and player for
+playing these files
+
 # Installation
 
  - For proper usage of mp3 you need to install ffmpeg. Tips on installation:
@@ -39,7 +43,11 @@ To compress your files you should do the following in the terminal:
 python3 PathToConvert.py PathToFile algorithm
 ```
  * Algorithm pararameter is optional. Default algorithm is lz77
- * Supported algorithms: lz77, lzw, deflate, huffman
+ * Supported algorithms:
+   - lz77
+   - lzw
+   - deflate
+   - huffman
 
 To play your files and show them in our player you should do the following:
 ```
