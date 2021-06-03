@@ -187,12 +187,9 @@ if __name__ == '__main__':
         print(f"Usage: {sys.argv[0]} file codec")
     else:
         path = sys.argv[1]
-#         print('Please, type desired algorithm for compression. Available algos: \
-# lz77, lzw, deflate.\nNote: lz77 is the only algo available for audio files.\n\
-# You can skip thi')
         try:
-            algo = sys.argv[2]  # './examples/mouse.mov'
+            algo = sys.argv[2] 
         except IndexError:
             algo = 'lz77'
         Convert(path, algo).save()
-        # conv.save()
+
