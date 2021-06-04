@@ -10,6 +10,10 @@
 
 # Description
 
+This program is implementation of custom codec applied for images, videos and audio files.
+It allows usage of LZW, LZ77, Huffman and Deflate algorithms of compression and player for
+playing these files
+
 # Installation
 
  - For proper usage of mp3 you need to install ffmpeg. Tips on installation:
@@ -27,6 +31,32 @@
     ```
     $ sudo apt-get install ffmpeg
     ```
+ - To install all the necessary libraries for proper work do the following:
+    ```
+    pip install -r requirements.txt
+    ```
+# Usage
+Note: Current version of the programm supports only png, jpg, mp3, mp4 and mov extensions of the files
+
+To compress your files you should do the following in the terminal:
+```
+python3 PathToConvert.py PathToFile algorithm
+```
+ * Algorithm pararameter is optional. Default algorithm is lz77
+ * Supported algorithms:
+   - lz77
+   - lzw
+   - deflate
+   - huffman
+
+To play your files and show them in our player you should do the following:
+```
+python3 PathToPlayer.py PathToFile
+```
+ * File to be played must have one of the following extensions of pur codec:
+   - bzbi for image
+   - bzbv for video
+   - bzba for audio
 
 # Contributing
 

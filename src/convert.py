@@ -8,10 +8,10 @@ from PIL import Image
 from moviepy.editor import VideoFileClip
 from pydub import AudioSegment
 import os
-from lzw import lzw_compress, lzw_decompress
-from Huffman_algo import HuffmanCode
-from lz77 import compress
-from deflate import Deflate
+from src.lzw import lzw_compress, lzw_decompress
+from src.Huffman_algo import HuffmanCode
+from src.lz77 import compress
+from src.deflate import Deflate
 
 
 class Convert:
@@ -44,6 +44,8 @@ class Convert:
 
         self.path = path
         self.compress = self.compresssion(compression_type)
+        self.compresssion_type = compression_type
+    
 
     def compresssion(self, compression_type):
         if compression_type.lower() == 'lz77':
@@ -65,9 +67,9 @@ class Convert:
         shape = np.array(arr.shape, dtype='uint16')
 
         if self.compress == HuffmanCode:
-            flat_arr = self.compress(arr.ravel()).encode()[0]
+            flat_arr = self.compress(arr.ravel()).encode()
+            flat_arr = np.array([flat_arr[0], flat_arr[1]])
         else:
-
             flat_arr = self.compress(arr.ravel())
 
         return flat_arr, shape
@@ -79,7 +81,7 @@ class Convert:
         img = Image.open(self.path).convert('RGB')
         
         arr, shape = self._convert_img(img)
-        img_info = np.array([arr, shape])
+        img_info = np.array([arr, shape, self.compresssion_type])
 
         np.savez_compressed(f'{self.path[:-3]}bzbi', info=img_info)
         self.bzb_extension('img')
@@ -92,7 +94,7 @@ class Convert:
         rate = clip.fps
         print(f"Number of frames: {clip.reader.nframes}")
         size = clip.size[::-1]
-        vid_info = np.array([rate, *size, 3.], dtype = np.int)
+        vid_info = np.array([rate, *size, 3., self.compresssion_type], dtype = np.int)
 
         #convert frames of the video into numpy
         frames = []
@@ -129,7 +131,7 @@ class Convert:
 
         frame_r = sound.frame_rate
         audio_info = np.array([peak_amplitude, channels_cnt, sound.frame_rate, 
-                    pckg_size, sound.frame_count()/ sound.frame_rate], dtype=object)
+                    pckg_size, sound.frame_count()/ sound.frame_rate, self.compresssion_type], dtype=object)
 
 
         package = []
@@ -182,8 +184,12 @@ class Convert:
 if __name__ == '__main__':
 
     if len(sys.argv) <= 1:
-        print(f"Usage: {sys.argv[0]} file")
+        print(f"Usage: {sys.argv[0]} file codec")
     else:
-        path = sys.argv[1]  # './examples/mouse.mov'
-        conv = Convert(path)
-        conv.save()
+        path = sys.argv[1]
+        try:
+            algo = sys.argv[2] 
+        except IndexError:
+            algo = 'lz77'
+        Convert(path, algo).save()
+
