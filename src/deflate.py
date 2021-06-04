@@ -5,8 +5,8 @@ IN COMPARISSON WITH OTHER ALGOS (WHERE DIFFERENT NUMES ARE WRITTEN)
 
 import numpy as np
 from typing import Dict
-from lz77 import compress, decompress
-from Huffman_algo import HuffmanCode
+from src.lz77 import compress, decompress
+from src.Huffman_algo import HuffmanCode
 
 class Deflate:
     '''
