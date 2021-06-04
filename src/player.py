@@ -1,9 +1,9 @@
 from concurrent.futures import ProcessPoolExecutor
-from src.lz77 import decompress as lz77_decompress
-from src.Huffman_algo import HuffmanCode
-from src.lzw import lzw_decompress
+from lz77 import decompress as lz77_decompress
+from Huffman_algo import HuffmanCode
+from lzw import lzw_decompress
 from time import sleep, time
-from src.deflate import Deflate
+from deflate import Deflate
 from mido import MidiFile
 import sounddevice as sd
 from cv2 import cv2
@@ -203,3 +203,6 @@ def play(path):
         "bzba": play_audio
     }
     res_dict[path.split('.')[-1]](path)
+
+if __name__ == '__main__':
+    play('examples/mouse.bzbv')

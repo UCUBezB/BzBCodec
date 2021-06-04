@@ -8,10 +8,10 @@ from PIL import Image
 from moviepy.editor import VideoFileClip
 from pydub import AudioSegment
 import os
-from src.lzw import lzw_compress, lzw_decompress
-from src.Huffman_algo import HuffmanCode
-from src.lz77 import compress
-from src.deflate import Deflate
+from lzw import lzw_compress, lzw_decompress
+from Huffman_algo import HuffmanCode
+from lz77 import compress
+from deflate import Deflate
 
 
 class Convert:
@@ -192,4 +192,3 @@ if __name__ == '__main__':
         except IndexError:
             algo = 'lz77'
         Convert(path, algo).save()
-

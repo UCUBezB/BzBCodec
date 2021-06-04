@@ -5,6 +5,7 @@ TODO: there is some problem with decompression (some bits are lost, though their
 '''
 
 import numpy as np
+from io import StringIO
 from typing import List, Tuple, Dict
 
 def lzw_compress(data: np.array) -> np.array:
@@ -47,11 +48,18 @@ def lzw_decompress(compressed: np.array) -> np.array:
     current_word: int = compressed.pop(0)
 
     res += [current_word]
-    for num in compressed:
+    for idx, num in enumerate(compressed):
         if num in mapping_dict:
             entry = mapping_dict[num]
         elif num == dict_size:
-            entry = tuple([*current_word, current_word[0]]) if not isinstance(current_word, int) else tuple([current_word])
+            # print(current_word)
+            if idx < 10:
+                print(f'num: {num}, current_word: {current_word}')
+
+            entry = tuple([*current_word, current_word[0]]) if not isinstance(current_word, int) else tuple([current_word, current_word])
+
+            if idx < 10:
+                print('00--',  entry)
 
         res += entry
         try:
@@ -88,7 +96,7 @@ if __name__ == '__main__':
     # Usage with image
     # --------------------------------------------------------------------------------
     from PIL import Image
-    img = Image.open('examples/test_img_2.png').convert('RGB')
+    img = Image.open('examples/test_img.png').convert('RGB')
     img = np.array(img.getdata())
     img = np.ravel(img)
     print(img.shape)
@@ -96,3 +104,5 @@ if __name__ == '__main__':
     start_time = time()
     compressed = lzw_compress(img)
     print(f'Compression has taken {time() - start_time}')
+    print(len(lzw_decompress(compressed)))
+    assert np.all(img == lzw_decompress(compressed))

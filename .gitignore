@@ -148,3 +148,4 @@ dmypy.json
 .pyre/
 
 virt
+rates.txt
