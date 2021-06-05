@@ -106,7 +106,7 @@ def show_image(path):
         if image_file[2].lower() == 'lzw':
             decompressed = lzw_decompress(image_file[0])
         elif image_file[2].lower() == 'deflate':
-            decompressed = Deflate().decode(*image_file[0])
+            decompressed = Deflate().decode(image_file[0])
         elif image_file[2].lower() == 'huffman':
             decompressed = HuffmanCode(image_file[0][0]).decode(image_file[0][1])
         else:

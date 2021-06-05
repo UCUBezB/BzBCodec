@@ -2,8 +2,8 @@ import numpy as np
 import sys
 from itertools import chain
 from typing import List
-from src.lz77 import compress, decompress
-from src.Huffman_algo import HuffmanCode
+from lz77 import compress, decompress
+from Huffman_algo import HuffmanCode
 
 class Deflate:
     '''
