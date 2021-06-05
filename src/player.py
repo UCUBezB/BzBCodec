@@ -10,6 +10,7 @@ from cv2 import cv2
 import numpy as np
 import functools
 import asyncio
+import sys
 
 def extract_wave_from_midi(filename='toccata.mid'):
     """
@@ -204,5 +205,9 @@ def play(path):
     }
     res_dict[path.split('.')[-1]](path)
 
-if __name__ == '__main__':
-    play('examples/mouse.bzbv')
+if __name__ == "__main__":
+    if len(sys.argv) > 1:
+        play(sys.argv[1])
+    else:
+        print(f"Usage: {sys.argv[0]} file[.bzba|.bzbv|.bzbi]")
+

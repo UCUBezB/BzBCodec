@@ -17,11 +17,11 @@ def compress(
 
     current_cut_position = 0
 
-    print_i = 0
+    # print_i = 0
     while len(input_array) != 0:
-        print_i += 1
-        if print_i % 1000 == 0:
-             print(current_cut_position, end='    \r')
+        # print_i += 1
+        # if print_i % 1000 == 0:
+        #     print(current_cut_position, end='    \r')
         length, offset = best_length_offset(buffer, input_array, max_length, max_offset)
         output.append((offset, length, input_array[0]))
         current_cut_position += length
