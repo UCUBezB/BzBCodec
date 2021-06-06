@@ -10,6 +10,7 @@ from cv2 import cv2
 import numpy as np
 import functools
 import asyncio
+import sys
 
 def extract_wave_from_midi(filename='toccata.mid'):
     """
@@ -105,7 +106,7 @@ def show_image(path):
         if image_file[2].lower() == 'lzw':
             decompressed = lzw_decompress(image_file[0])
         elif image_file[2].lower() == 'deflate':
-            decompressed = Deflate().decode(*image_file[0])
+            decompressed = Deflate().decode(image_file[0])
         elif image_file[2].lower() == 'huffman':
             decompressed = HuffmanCode(image_file[0][0]).decode(image_file[0][1])
         else:
@@ -204,5 +205,9 @@ def play(path):
     }
     res_dict[path.split('.')[-1]](path)
 
-if __name__ == '__main__':
-    play('examples/mouse.bzbv')
+if __name__ == "__main__":
+    if len(sys.argv) > 1:
+        play(sys.argv[1])
+    else:
+        print(f"Usage: {sys.argv[0]} file[.bzba|.bzbv|.bzbi]")
+
