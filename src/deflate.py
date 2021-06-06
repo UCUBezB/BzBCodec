@@ -70,7 +70,7 @@ class Deflate:
             elif elm[0] == 1:
                 ov_size += len(elm[2]) + len(elm[4]) + sys.getsizeof(elm[1]) + sys.getsizeof(elm[3])
         
-        print(f'Overall size of compression is: {ov_size}')
+        print(f'Overall size of compression with deflate is: {ov_size}')
     
         return res
     

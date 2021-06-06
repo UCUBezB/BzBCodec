@@ -1,6 +1,6 @@
 import heapq
 import numpy as np
-from collections import Counter, namedtuple
+from collections import Counter
 
 
 class Node():
@@ -105,10 +105,10 @@ class HuffmanCode():
                 if self.data.startswith(decode_dict[key]):
                     self.data = self.data[len(decode_dict[key]):]
                     res.append(key)
-        return res
+        return np.array(res)
 
 if __name__ == '__main__':
-    a = HuffmanCode(np.array([-1,2,1,-3,-1,2,1,-1,-1,0,1,1,-1,-1,2,1,-3,-1,3,0,-2,1,1,-1,
+    msg_to_encode = np.array([-1,2,1,-3,-1,2,1,-1,-1,0,1,1,-1,-1,2,1,-3,-1,3,0,-2,1,1,-1,
  0,0,0,1,0,-1,-1,0,1,1,0,-2,-1,3,2,-4,-3,5,3,-6,-2,6,0,-5,
  1,4,-2,-3,3,3,-3,-4,2,4,-1,-3,0,2,0,0,0,-2,0,3,0,-4,0,4,
  0,-3,0,2,0,-1,0,0,0,0,0,0,1,0,-2,0,3,0,-3,0,2,0,-2,0,
@@ -116,9 +116,12 @@ if __name__ == '__main__':
 -1,3,0,-1,1,-1,-2,1,2,-1,-1,2,0,-2,0,2,0,-2,0,1,0,0,1,0,
 -1,0,-1,1,3,-2,-4,2,4,-2,-3,1,2,1,-2,-2,2,2,-2,-2,2,2,-1,-2,
  0,3,0,-4,0,4,1,-3,-2,2,2,-1,-1,0,0,1,1,-2,-2,3,2,-3,-1,3,
- 0,-3,0,2,0,-1,0,0]))
+ 0,-3,0,2,0,-1,0,0])
+    a = HuffmanCode(msg_to_encode)
     b, coded_text = a.encode()
     print(b)
     print()
     c = HuffmanCode(b)
-    print(c.decode(coded_text))
+    decoded = c.decode(coded_text)
+    print(decoded, type(decoded))
+    assert np.all(msg_to_encode == decoded)
